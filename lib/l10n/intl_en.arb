@@ -1,0 +1,9 @@
+{
+  "@@locale": "en",
+  "@@last_modified": "2018-11-03T15:02:36.546976",
+  "title": "Flutter Example App",
+  "@title": {
+    "type": "text",
+    "placeholders": {}
+  }
+}
