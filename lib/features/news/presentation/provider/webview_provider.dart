@@ -7,7 +7,7 @@ class WebViewStateNotifier extends StateNotifier<WebViewState> {
 
   void updateProgress(int progress) {
     if (progress < 100) {
-      state = WebViewLoading(progress: progress);
+      state = WebViewLoading(progress: progress / 100);
     } else {
       state = WebViewLoaded();
     }
@@ -21,7 +21,7 @@ class WebViewStateNotifier extends StateNotifier<WebViewState> {
 abstract class WebViewState {}
 
 class WebViewLoading extends WebViewState {
-  final int progress;
+  final double progress;
   WebViewLoading({
     required this.progress,
   });

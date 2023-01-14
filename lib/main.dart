@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:go_router/go_router.dart";
+import "package:lumi_assignment/core/navigation/custom_page_transition_builder.dart";
 import "package:lumi_assignment/injection_container.dart";
 import "injection_container.dart" as di;
 
@@ -13,11 +14,9 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.grey.shade50,
-    ),
-  );
+      statusBarBrightness: Brightness.dark));
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -32,6 +31,10 @@ class MyApp extends StatelessWidget {
       title: "Number Trivia",
       theme: ThemeData(
           fontFamily: "Poppins",
+          pageTransitionsTheme: const PageTransitionsTheme(builders: {
+            TargetPlatform.android: CustomPageTransitionsBuilder(),
+            TargetPlatform.iOS: CustomPageTransitionsBuilder(),
+          }),
           dividerTheme: DividerThemeData(
               color: Colors.grey.shade300, thickness: 0.4, space: 32),
           appBarTheme: AppBarTheme(

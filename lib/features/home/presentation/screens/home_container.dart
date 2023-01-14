@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
 import "package:lumi_assignment/features/home/presentation/widgets/animated_bottom_nav.dart";
-import "package:lumi_assignment/features/news/presentation/screens/latest_screen/latest_screen.dart";
+import "package:lumi_assignment/features/news/presentation/screens/home_screen/home_screen.dart";
 import "package:lumi_assignment/features/setting/presentation/screen/setting_screen.dart";
 
 class HomeContainer extends StatefulWidget {
@@ -16,7 +16,6 @@ class _HomeContainerState extends State<HomeContainer>
   final PageController _pageController = PageController();
   final bottomnavigationkey = GlobalKey();
   late AnimationController bottomNaviController;
-  late Animation<double> animation;
   final ValueNotifier<int> _currentTabIndex = ValueNotifier(0);
   bool isAnimatedHide = false;
   bool isAnimatedShow = false;
@@ -24,7 +23,7 @@ class _HomeContainerState extends State<HomeContainer>
   @override
   void initState() {
     bottomNaviController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
+        vsync: this, duration: const Duration(milliseconds: 300));
     bottomNaviController.forward();
     super.initState();
   }

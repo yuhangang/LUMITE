@@ -39,7 +39,7 @@ class RewardsStickyHeaderWidgetDelegate
   RewardsStickyHeaderWidgetDelegate(
       {required this.carrousselWidget,
       required this.stickyWidget,
-      this.headerAnimation = StickyHeaderWidgetAnimation.growShrink,
+      this.headerAnimation = StickyHeaderWidgetAnimation.popInOut,
       this.navigationTitle = "",
       this.isRewardsPage = false,
       this.isDetailPage = false,
@@ -101,12 +101,14 @@ class RewardsStickyHeaderWidgetDelegate
                             ),
                           )),
                 ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: MediaQuery.of(context).padding.top,
-                  bottom: 0,
-                  child: _buildHeader(shrinkOffset, context),
+                Transform.translate(
+                  offset: Offset(0,
+                      MediaQuery.of(context).padding.top - (shrinkOffset / 3)),
+                  child: carrousselWidget,
+                ),
+                Container(
+                  height: MediaQuery.of(context).padding.top,
+                  color: Colors.grey.shade50,
                 ),
                 if (headerAnimation == StickyHeaderWidgetAnimation.growShrink)
                   _buildGrowAppBar(context, shrinkOffset),
@@ -118,65 +120,6 @@ class RewardsStickyHeaderWidgetDelegate
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildHeader(double shrinkOffset, BuildContext context) {
-    Widget imageHeaderWidget;
-    Widget statusBannerWidget;
-    switch (headerAnimation) {
-      case StickyHeaderWidgetAnimation.fadeInOut:
-        imageHeaderWidget = Opacity(
-          opacity: _calculateOpacity(shrinkOffset),
-          child: carrousselWidget,
-        );
-        statusBannerWidget = Opacity(
-            opacity: _calculateStatusOpacity(shrinkOffset),
-            child: _buildStatusBannerFiller());
-        break;
-      case StickyHeaderWidgetAnimation.popInOut:
-        statusBannerWidget = Opacity(
-            opacity: _calculateStatusOpacity(shrinkOffset),
-            child: _buildStatusBannerFiller());
-        imageHeaderWidget = Opacity(
-          opacity: _calculatePopOpacity(shrinkOffset),
-          child: carrousselWidget,
-        );
-        break;
-      case StickyHeaderWidgetAnimation.growShrink:
-        statusBannerWidget = _buildStatusBannerFiller();
-        imageHeaderWidget = carrousselWidget;
-        break;
-    }
-
-    var bottomMargin = stickyWidgetHeight / 2;
-    if (!enableStickyWidget) {
-      bottomMargin = 0.0;
-    }
-
-    return Container(
-      color: Colors.grey.shade50,
-      child: Stack(
-        children: [
-          if (showStatusBanner)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: statusBannerWidget,
-            ),
-          Container(
-            margin: EdgeInsets.only(bottom: bottomMargin),
-            width: double.infinity,
-            child: imageHeaderWidget,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Container _buildStatusBannerFiller() {
-    return Container(
-      height: stickyWidgetHeight / 2,
-      color: statusBannerColor,
     );
   }
 
@@ -214,41 +157,6 @@ class RewardsStickyHeaderWidgetDelegate
     }
   }
 
-  double _calculateStatusOpacity(double offset) {
-    if ((maxExtentWidget - minExtentWidget) > offset - statusBannerHeight) {
-      return 1.0;
-    } else {
-      return 0.0;
-    }
-  }
-
-  double _calculateOpacity(double offset) {
-    if (!enableStickyWidget) {
-      return 1.0;
-    }
-    if (offset == 0.0 || offset <= 20) {
-      return 1;
-    } else if (offset >= fullOpacityOffset) {
-      return 0;
-    } else {
-      var opacityVal =
-          ((offset - fullOpacityOffset) / (0 - fullOpacityOffset)).abs();
-      if (opacityVal > 1.0) {
-        return 1.0;
-      }
-      return opacityVal;
-    }
-  }
-
-  double _calculatePopOpacity(double offset) {
-    if (offset >= (zeroOpacityOffset - fullOpacityOffset)) {
-      return 0;
-    } else {
-      return 1;
-    }
-  }
-
-  //fixme(anyone): Optimize calculate height and bug fix if user scroll too fast
   double _calculateHeight(double offset) {
     if (offset >= startGrowOffset) {
       if (growBarHeightDiff == 28.0) {

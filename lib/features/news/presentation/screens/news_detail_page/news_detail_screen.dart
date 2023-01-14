@@ -2,16 +2,21 @@ import "package:cached_network_image/cached_network_image.dart";
 import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:lumi_assignment/features/setting/presentation/provider/statistics_provider.dart";
+import "package:webview_flutter/webview_flutter.dart";
+
 import "package:lumi_assignment/core/commons/helper/url_launch_helper.dart";
 import "package:lumi_assignment/features/news/data/model/news.dart";
-import "package:lumi_assignment/features/news/presentation/provider/news_detail_screen_provider.dart";
-import "package:webview_flutter/webview_flutter.dart";
+import "package:lumi_assignment/features/news/presentation/provider/webview_provider.dart";
+import "package:lumi_assignment/features/setting/data/model/news_category.dart";
 
 class NewsDetailScreen extends ConsumerStatefulWidget {
   final News news;
+  final NewsCategory category;
   const NewsDetailScreen({
     Key? key,
     required this.news,
+    required this.category,
   }) : super(key: key);
 
   @override
@@ -28,7 +33,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
   @override
   void initState() {
     _webViewController
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setJavaScriptMode(JavaScriptMode.disabled)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -64,31 +69,37 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
       )
       ..loadRequest(Uri.parse(widget.news.link));
     Future.delayed(const Duration(milliseconds: 2000), () {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          width: 14 * 12 + 38,
-          behavior: SnackBarBehavior.floating,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(100))),
-          content: GestureDetector(
-            onTap: () => UrlLaunchHelper.launchUrl("https://google.com"),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.mail),
-                SizedBox(
-                  width: 16,
-                ),
-                Text("Share Statistics")
-              ],
-            ),
-          )));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            width: 14 * 12 + 38,
+            behavior: SnackBarBehavior.floating,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(100))),
+            content: GestureDetector(
+              onTap: () => UrlLaunchHelper.openUrl("https://google.com"),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.mail),
+                  SizedBox(
+                    width: 16,
+                  ),
+                  Text("Share Statistics")
+                ],
+              ),
+            )));
+      }
     });
+    ref
+        .read(statisticsProvider.notifier)
+        .onOpenNews(widget.news, widget.category);
     super.initState();
   }
 
   late final WebViewCookieManager cookieManager = WebViewCookieManager();
   @override
   Widget build(BuildContext context) {
+    final webViewState = ref.watch(webViewProvider);
     return WillPopScope(
       onWillPop: () async {
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -133,7 +144,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
                 itemBuilder: (context) => [
                       PopupMenuItem<int>(
                         onTap: () async {
-                          UrlLaunchHelper.launchUrl(widget.news.link);
+                          UrlLaunchHelper.openUrl(widget.news.link);
                         },
                         value: 0,
                         child: Row(
@@ -149,10 +160,20 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
                     ]),
           ],
           bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(8),
-              child: Container(
-                color: Colors.blue.shade600,
-                height: 8,
+              preferredSize: const Size.fromHeight(0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: AnimatedContainer(
+                  duration: webViewState is WebViewLoading
+                      ? const Duration(milliseconds: 200)
+                      : Duration.zero,
+                  color: Colors.blue.shade600,
+                  height: 5,
+                  width: webViewState is WebViewLoading
+                      ? MediaQuery.of(context).size.width *
+                          webViewState.progress
+                      : 0,
+                ),
               )),
         ),
         body: WebViewWidget(controller: _webViewController),

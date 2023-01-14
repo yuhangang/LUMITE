@@ -33,11 +33,11 @@ class _CategoryTabBarWidgetState extends State<CategoryTabBarWidget> {
     if (widget._scrollController != null) {
       widget._scrollController!.addListener(() {
         final position2 = widget._scrollController!.offset;
-        if (position2 > 70 && !showShadow) {
+        if (position2 > 60 && !showShadow) {
           setState(() {
             showShadow = true;
           });
-        } else if (position2 <= 70 && showShadow) {
+        } else if (position2 <= 60 && showShadow) {
           setState(() {
             showShadow = false;
           });
@@ -62,19 +62,26 @@ class _CategoryTabBarWidgetState extends State<CategoryTabBarWidget> {
                         blurRadius: 2)
                   ]
                 : []),
-        child: TabBar(
-          isScrollable: true,
-          controller: widget._categoryTabController,
-          indicatorPadding: EdgeInsets.zero,
-          indicatorWeight: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-          onTap: (index) => widget._onChangeCategory.call(index),
-          tabs: _buildCategoryTabs,
-          indicator: const BoxDecoration(color: Colors.white),
-          unselectedLabelColor: Colors.black,
-          labelColor: Colors.white,
-          //  dragStartBehavior: DragStartBehavior.down,
+        child: Row(
+          children: [
+            Expanded(
+              child: TabBar(
+                isScrollable: true,
+                controller: widget._categoryTabController,
+                indicatorPadding: EdgeInsets.zero,
+                indicatorWeight: 0,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                onTap: (index) => widget._onChangeCategory.call(index),
+                tabs: _buildCategoryTabs,
+                indicator: const BoxDecoration(color: Colors.white),
+                unselectedLabelColor: Colors.black,
+                labelColor: Colors.white,
+                //  dragStartBehavior: DragStartBehavior.down,
+              ),
+            ),
+          ],
         ),
       ),
     );

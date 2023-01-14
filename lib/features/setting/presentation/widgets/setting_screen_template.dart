@@ -14,6 +14,8 @@ class SettingScreenTemplate extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: true,
+          elevation: 0,
+          shadowColor: Colors.grey,
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(30),
             child: Padding(
