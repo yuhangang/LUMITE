@@ -1,31 +1,26 @@
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:visibility_detector/visibility_detector.dart";
-
-import "package:lumi_assignment/core/commons/helper/url_launch_helper.dart";
-import "package:lumi_assignment/core/navigation/coordinator.dart";
 import "package:lumi_assignment/features/news/presentation/provider/home_tab_greeting_text_provider.dart";
-import "package:lumi_assignment/features/news/presentation/provider/news_list_provider.dart";
+import "package:lumi_assignment/features/news/presentation/screens/home_screen/widgets/home_screen_categorized_news_list.dart";
 import "package:lumi_assignment/features/news/presentation/widgets/category_tab_bar.dart";
-import "package:lumi_assignment/features/news/presentation/widgets/news_item.dart";
-import "package:lumi_assignment/features/news/presentation/widgets/sticky_header.dart";
+import "package:lumi_assignment/features/news/presentation/widgets/custom_sticky_header_delegate.dart";
 import "package:lumi_assignment/features/setting/data/model/news_category.dart";
 import "package:lumi_assignment/features/setting/presentation/provider/display_setting_provider.dart";
 import "package:lumi_assignment/features/setting/presentation/provider/news_categories_setting_provider.dart";
-import "package:lumi_assignment/injection_container.dart";
 
-class LatestScreen extends ConsumerStatefulWidget {
-  const LatestScreen({super.key});
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  ConsumerState<LatestScreen> createState() => _LatestScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _LatestScreenState extends ConsumerState<LatestScreen>
+class _HomeScreenState extends ConsumerState<HomeScreen>
     with TickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _categoryTabController;
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int> _currenTabIndex = ValueNotifier(0);
+  final GlobalKey<NestedScrollViewState> documentsNestedKey = GlobalKey();
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -69,50 +64,65 @@ class _LatestScreenState extends ConsumerState<LatestScreen>
             _initTabController(categoryList);
             return NestedScrollView(
               controller: _scrollController,
+              //  floatHeaderSlivers: true,
               headerSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) {
+                final stickyWidgetHeight =
+                    46 + (16 * MediaQuery.textScaleFactorOf(context));
+                final expandableWidgetHeight =
+                    MediaQuery.of(context).padding.top +
+                        75 +
+                        (60 * MediaQuery.textScaleFactorOf(context));
                 return <Widget>[
-                  SliverPersistentHeader(
-                      pinned: true,
-                      floating: true,
-                      delegate: RewardsStickyHeaderWidgetDelegate(
-                        minExtentWidget: 0,
-                        maxExtentWidget: 162,
-                        stickyWidgetHeight: 52,
-                        stickyWidget: Align(
-                          alignment: Alignment.centerLeft,
-                          child: CategoryTabBarWidget(
-                              categoryTabController: _categoryTabController,
-                              scrollController: _scrollController,
-                              categories: categoryList
-                                  .map((e) => e.displayText)
-                                  .toList(),
-                              onChangeCategory: (index) {},
-                              currenTabIndex: _currenTabIndex),
-                        ),
-                        carrousselWidget: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                greetingText.title,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline5
-                                    ?.copyWith(height: 1.3),
-                              ),
-                              Text(greetingText.subtitle ?? "",
+                  SliverOverlapAbsorber(
+                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                        context),
+                    sliver: SliverPersistentHeader(
+                        pinned: true,
+                        floating: true,
+                        delegate: CustomStickyHeaderWidgetDelegate(
+                          vsync: this,
+                          minExtentWidget: 0,
+                          maxExtentWidget: expandableWidgetHeight,
+                          stickyWidgetHeight: stickyWidgetHeight,
+                          stickyWidget: Align(
+                            alignment: Alignment.centerLeft,
+                            child: CategoryTabBarWidget(
+                                height: stickyWidgetHeight,
+                                categoryTabController: _categoryTabController,
+                                scrollController: _scrollController,
+                                categories: categoryList
+                                    .map((e) => "${e.displayText}  ${e.emoji}")
+                                    .toList(),
+                                onChangeCategory: (index) {},
+                                currenTabIndex: _currenTabIndex),
+                          ),
+                          expandableWidget: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  greetingText.title,
                                   style: Theme.of(context)
                                       .textTheme
-                                      .bodyText1
-                                      ?.copyWith(color: Colors.grey.shade500)),
-                            ],
+                                      .headline5
+                                      ?.copyWith(height: 1.3),
+                                ),
+                                Text(greetingText.subtitle ?? "",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        ?.copyWith(
+                                            color: Colors.grey.shade500)),
+                              ],
+                            ),
                           ),
-                        ),
-                      )),
+                        )),
+                  ),
+
                   /*
                   SliverAppBar(
                     pinned: true,
@@ -151,7 +161,29 @@ class _LatestScreenState extends ConsumerState<LatestScreen>
               body: TabBarView(
                   controller: _categoryTabController,
                   children: categoryList
-                      .map((e) => _buildNewsList(e, shouldShowWideView))
+                      .map((e) => Builder(builder: (context) {
+                            // final scrollController =
+                            //     ScrollController(keepScrollOffset: true);
+                            return CustomScrollView(
+                              // controller: scrollController
+                              //   ..addListener(
+                              //     () {
+                              //       controllerListener(
+                              //         _scrollController,
+                              //         scrollController,
+                              //       );
+                              //     },
+                              //   ),
+                              key: PageStorageKey<String>(e.id),
+                              slivers: [
+                                SliverOverlapInjector(
+                                    handle: NestedScrollView
+                                        .sliverOverlapAbsorberHandleFor(
+                                            context)),
+                                _buildNewsList(e, shouldShowWideView),
+                              ],
+                            );
+                          }))
                       .toList()),
             );
           },
@@ -161,37 +193,58 @@ class _LatestScreenState extends ConsumerState<LatestScreen>
     );
   }
 
-  Widget _buildNewsList(NewsCategory category, bool shouldShowWideView) {
-    if (category.id == "covid") {
-      return VisibilityDetector(
-          key: Key(category.id),
-          child: NewsList(
-            category: category,
-            shouldShowWideView: shouldShowWideView,
-          ),
-          onVisibilityChanged: (info) {
-            if (info.visibleFraction == 1) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  width: 14 * 12 + 38,
-                  content: GestureDetector(
-                    onTap: () => UrlLaunchHelper.openUrl("https://google.com"),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.mail),
-                        SizedBox(
-                          width: 16,
-                        ),
-                        Text("Share Statistics")
-                      ],
-                    ),
-                  )));
-            } else if (info.visibleFraction == 0) {
-              ScaffoldMessenger.of(context).clearSnackBars();
-            }
-          });
+  void controllerListener(
+    ScrollController parent,
+    ScrollController child,
+  ) {
+    final childPX = child.position.pixels;
+    final parentPX = parent.position.pixels;
+    final parentPXMax = parent.position.maxScrollExtent;
+
+    if (childPX >= 0 && parentPX < parentPXMax) {
+      parent.position.moveTo(childPX + parentPX);
+    } else {
+      final currenParentPos = childPX + parentPX;
+      parent.position.moveTo(currenParentPos);
     }
-    return NewsList(
+  }
+
+  Widget _buildNewsList(NewsCategory category, bool shouldShowWideView) {
+    /*
+    if (category.id == "covid") {
+      return SliverToBoxAdapter(
+        child: VisibilityDetector(
+            key: Key(category.id),
+            child: HomeScreenNewsList(
+              category: category,
+              shouldShowWideView: shouldShowWideView,
+            ),
+            onVisibilityChanged: (info) {
+              if (info.visibleFraction == 1) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    width: 14 * 12 + 38,
+                    content: GestureDetector(
+                      onTap: () => UrlLaunchHelper.openUrl(
+                          "https://luminews.my/covidtracker"),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.mail),
+                          SizedBox(
+                            width: 16,
+                          ),
+                          Text("Share Statistics")
+                        ],
+                      ),
+                    )));
+              } else if (info.visibleFraction == 0) {
+                ScaffoldMessenger.of(context).clearSnackBars();
+              }
+            }),
+      );
+    }
+    */
+    return HomeScreenCategorizedNewsList(
       category: category,
       shouldShowWideView: shouldShowWideView,
     );
@@ -207,49 +260,5 @@ class _LatestScreenState extends ConsumerState<LatestScreen>
         }
       });
     }
-  }
-}
-
-class NewsList extends ConsumerWidget {
-  final NewsCategory category;
-  final bool shouldShowWideView;
-
-  const NewsList({
-    super.key,
-    required this.category,
-    required this.shouldShowWideView,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final newsListState = ref.watch(newsListProvider);
-    return newsListState.when(
-        data: (newsList) => RefreshIndicator(
-              onRefresh: () async {},
-              child: ListView.separated(
-                  itemCount: newsList.length,
-                  padding: const EdgeInsets.only(
-                      top: 16, bottom: 40, left: 16, right: 16),
-                  separatorBuilder: (_, __) => const Divider(),
-                  itemBuilder: (context, index) {
-                    final news = newsList[index];
-                    return NewsItem(
-                      title: news.newsTitle,
-                      publisherName: news.publisherName,
-                      imageUrl: news.imageUrl,
-                      publisherIcon: news.publisherImageUrl,
-                      updatedTime: news.updated,
-                      wideView: shouldShowWideView,
-                      onTap: () {
-                        sl
-                            .get<Coordinator>()
-                            .navigateToNewsDetailScreen(news, category);
-                      },
-                    );
-                  }),
-            ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (obj, stackTrace) =>
-            const Center(child: CircularProgressIndicator()));
   }
 }

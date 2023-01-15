@@ -1,7 +1,10 @@
-import "package:cached_network_image/cached_network_image.dart";
+import "dart:async";
+
 import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:lumi_assignment/core/presentation/widgets/custom_cache_network_image.dart";
+import "package:lumi_assignment/core/presentation/widgets/overlay_state_mixin.dart";
 import "package:lumi_assignment/features/setting/presentation/provider/statistics_provider.dart";
 import "package:webview_flutter/webview_flutter.dart";
 
@@ -23,7 +26,8 @@ class NewsDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<NewsDetailScreen> createState() => _NewsDetailScreenState();
 }
 
-class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
+class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen>
+    with OverlayStateMixin {
   late final WebViewController _webViewController = WebViewController();
   final webViewProvider =
       StateNotifierProvider<WebViewStateNotifier, WebViewState>((ref) {
@@ -70,24 +74,12 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
       ..loadRequest(Uri.parse(widget.news.link));
     Future.delayed(const Duration(milliseconds: 2000), () {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            width: 14 * 12 + 38,
-            behavior: SnackBarBehavior.floating,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(100))),
-            content: GestureDetector(
-              onTap: () => UrlLaunchHelper.openUrl("https://google.com"),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.mail),
-                  SizedBox(
-                    width: 16,
-                  ),
-                  Text("Share Statistics")
-                ],
-              ),
-            )));
+        insertOverlay(TextButton(
+            onPressed: () {},
+            child: Container(
+                color: Colors.green,
+                padding: const EdgeInsets.all(50),
+                child: const Text("abc"))));
       }
     });
     ref
@@ -96,13 +88,20 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   late final WebViewCookieManager cookieManager = WebViewCookieManager();
   @override
   Widget build(BuildContext context) {
     final webViewState = ref.watch(webViewProvider);
     return WillPopScope(
       onWillPop: () async {
-        ScaffoldMessenger.of(context).clearSnackBars();
+        if (isOverlayShown) {
+          removeOverlay();
+        }
         return true;
       },
       child: Scaffold(
@@ -111,22 +110,19 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
           automaticallyImplyLeading: true,
           elevation: 2,
           title: Row(children: [
-            Container(
-              height: 32,
-              width: 32,
-              margin: const EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey.shade100,
-                        offset: const Offset(0, 5),
-                        blurRadius: 2)
-                  ]),
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              child: CachedNetworkImage(
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: CustomCachedNetworkImage(
                 imageUrl: widget.news.publisherImageUrl,
                 fit: BoxFit.fitHeight,
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.grey.shade100,
+                      offset: const Offset(0, 5),
+                      blurRadius: 2)
+                ],
+                height: 32,
+                width: 32,
               ),
             ),
             Text(

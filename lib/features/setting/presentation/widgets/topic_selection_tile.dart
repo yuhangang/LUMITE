@@ -15,10 +15,13 @@ class TopicSelectionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        height: 100,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.fastOutSlowIn,
         decoration: BoxDecoration(
-            color: isSelected ? Colors.blue.shade600 : Colors.blueGrey.shade200,
+            color: isSelected
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.onSecondary,
             borderRadius: BorderRadius.circular(20)),
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -27,17 +30,23 @@ class TopicSelectionTile extends StatelessWidget {
           children: [
             AnimatedOpacity(
                 opacity: isSelected ? 1 : 0,
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.fastOutSlowIn,
                 child: const Align(
                   alignment: Alignment.topRight,
-                  child: Icon(Icons.check_circle),
+                  child: Icon(
+                    Icons.check_circle,
+                  ),
                 )),
-            Text(
-              title,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyText1
-                  ?.copyWith(color: Colors.white),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                title,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyText1
+                    ?.copyWith(color: Colors.white),
+              ),
             ),
           ],
         ),

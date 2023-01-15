@@ -68,7 +68,7 @@ class SettingItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-            color: Colors.blue.shade50,
+            color: Colors.blueGrey.shade50,
             borderRadius: const BorderRadius.all(Radius.circular(8))),
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -80,7 +80,7 @@ class SettingItem extends StatelessWidget {
             )),
             Icon(
               Icons.arrow_forward_ios,
-              color: Colors.blue.shade200,
+              color: Theme.of(context).colorScheme.onPrimary,
             )
           ],
         ),

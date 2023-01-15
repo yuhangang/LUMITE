@@ -37,7 +37,7 @@ class _HomeContainerState extends State<HomeContainer>
           child: PageView(
             controller: _pageController,
             physics: const NeverScrollableScrollPhysics(),
-            children: const [LatestScreen(), SettingScreen()],
+            children: const [HomeScreen(), SettingScreen()],
           ),
         ),
         ValueListenableBuilder<int>(

@@ -6,10 +6,15 @@ part "news_category.g.dart";
 class NewsCategory {
   final String id;
   final String displayText;
+  final String emoji;
   final bool optional;
 
-  const NewsCategory(
-      {required this.id, required this.displayText, this.optional = true});
+  const NewsCategory({
+    required this.id,
+    required this.displayText,
+    required this.emoji,
+    this.optional = true,
+  });
 
   factory NewsCategory.fromJson(Map<String, dynamic> json) =>
       _$NewsCategoryFromJson(json);

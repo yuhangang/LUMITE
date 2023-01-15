@@ -24,6 +24,8 @@ class AnimatedBottomNaviBar extends StatelessWidget {
         AnimatedBuilder(
           animation: bottomNaviController,
           builder: (_, child) {
+            final fontSize = Theme.of(context).textTheme.bodyText2!.fontSize! *
+                MediaQuery.textScaleFactorOf(context);
             return SizeTransition(
               axisAlignment: -1,
               sizeFactor: bottomNaviController,
@@ -33,6 +35,9 @@ class AnimatedBottomNaviBar extends StatelessWidget {
                 onTap: onTapItem,
                 elevation: 3,
                 items: items,
+                selectedFontSize: fontSize,
+                unselectedFontSize: fontSize,
+                iconSize: 24 * MediaQuery.textScaleFactorOf(context),
               ),
             );
           },

@@ -25,7 +25,7 @@ class _TopicsSettingScreenState extends ConsumerState<TopicsSettingScreen> {
               crossAxisCount: 2,
               crossAxisSpacing: 20,
               mainAxisSpacing: 20,
-              childAspectRatio: 18 / 9,
+              childAspectRatio: 1.5,
               shrinkWrap: true,
               children: AppConfig.newsCategoryOptions
                   .where((element) => element.optional)
@@ -33,7 +33,7 @@ class _TopicsSettingScreenState extends ConsumerState<TopicsSettingScreen> {
                 final isSelected = categories.contains(e);
                 return TopicSelectionTile(
                   isSelected: isSelected,
-                  title: e.displayText,
+                  title: "${e.displayText} ${e.emoji}",
                   onTap: () {
                     if (isSelected) {
                       ref

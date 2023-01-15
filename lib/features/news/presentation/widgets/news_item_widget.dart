@@ -1,7 +1,7 @@
-import "package:cached_network_image/cached_network_image.dart";
 import "package:flutter/material.dart";
+import "package:lumi_assignment/core/presentation/widgets/custom_cache_network_image.dart";
 
-class NewsItem extends StatelessWidget {
+class NewsItemWidget extends StatelessWidget {
   final String title;
   final String publisherName;
   final String updatedTime;
@@ -10,7 +10,7 @@ class NewsItem extends StatelessWidget {
   final bool wideView;
   final VoidCallback onTap;
 
-  const NewsItem({
+  const NewsItemWidget({
     Key? key,
     required this.title,
     required this.publisherName,
@@ -35,32 +35,30 @@ class NewsItem extends StatelessWidget {
       children: [
         Row(
           children: [
-            Container(
+            SizedBox(
               height: 100,
               width: 100,
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(8))),
-              clipBehavior: Clip.antiAliasWithSaveLayer,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  CachedNetworkImage(
+                  CustomCachedNetworkImage(
                     imageUrl: imageUrl,
                     fit: BoxFit.fitHeight,
+                    width: 100,
                   ),
                   Align(
                     alignment: Alignment.bottomRight,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(8))),
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      child: CachedNetworkImage(
+                    child: CustomCachedNetworkImage(
                         imageUrl: publisherIcon,
                         fit: BoxFit.fitHeight,
                         height: 24,
                         width: 24,
-                      ),
-                    ),
+                        boxShadow: const [
+                          BoxShadow(
+                              color: Colors.black12,
+                              offset: Offset(1, 1),
+                              blurRadius: 3)
+                        ]),
                   )
                 ],
               ),
@@ -106,16 +104,10 @@ class NewsItem extends StatelessWidget {
     return Column(
       children: [
         AspectRatio(
-          aspectRatio: 1.33,
-          child: Container(
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10))),
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            child: CachedNetworkImage(
+          aspectRatio: 1.5,
+          child: CustomCachedNetworkImage(
               imageUrl: imageUrl,
-              fit: BoxFit.fitHeight,
-            ),
-          ),
+              borderRadius: const BorderRadius.all(Radius.circular(10))),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -124,17 +116,16 @@ class NewsItem extends StatelessWidget {
         ),
         Row(
           children: [
-            Container(
-              height: 32,
-              width: 32,
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(8))),
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              child: CachedNetworkImage(
+            CustomCachedNetworkImage(
                 imageUrl: publisherIcon,
-                fit: BoxFit.fitHeight,
-              ),
-            ),
+                height: 32,
+                width: 32,
+                boxShadow: const [
+                  BoxShadow(
+                      color: Colors.black12,
+                      offset: Offset(0, 2),
+                      blurRadius: 2)
+                ]),
             const SizedBox(
               width: 16,
             ),

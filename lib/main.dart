@@ -16,7 +16,7 @@ void main() async {
 
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.grey.shade50,
-      statusBarBrightness: Brightness.dark));
+      statusBarIconBrightness: Brightness.dark));
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -31,6 +31,8 @@ class MyApp extends StatelessWidget {
       title: "Number Trivia",
       theme: ThemeData(
           fontFamily: "Poppins",
+          iconTheme:
+              IconThemeData(size: 24 * MediaQuery.textScaleFactorOf(context)),
           pageTransitionsTheme: const PageTransitionsTheme(builders: {
             TargetPlatform.android: CustomPageTransitionsBuilder(),
             TargetPlatform.iOS: CustomPageTransitionsBuilder(),
@@ -41,8 +43,8 @@ class MyApp extends StatelessWidget {
               backgroundColor: Colors.grey.shade50,
               shadowColor: Colors.grey.shade600.withOpacity(0.1),
               foregroundColor: Colors.blue.shade500,
-              systemOverlayStyle:
-                  SystemUiOverlayStyle(statusBarColor: Colors.grey.shade50)),
+              systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarIconBrightness: Brightness.dark)),
           snackBarTheme: const SnackBarThemeData(
             elevation: 0,
             behavior: SnackBarBehavior.floating,
@@ -50,11 +52,11 @@ class MyApp extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(100))),
           ),
           colorScheme: ColorScheme(
-              primary: Colors.green.shade800,
-              secondary: Colors.green.shade600,
+              primary: Colors.blueAccent.shade700,
+              secondary: Colors.blueGrey.shade100,
               brightness: Brightness.light,
-              onPrimary: Colors.green.shade200,
-              onSecondary: Colors.green.shade600,
+              onPrimary: Colors.blueAccent.shade400,
+              onSecondary: Colors.blueGrey.shade50,
               error: Colors.red,
               onError: Colors.red.shade300,
               background: Colors.grey.shade100,

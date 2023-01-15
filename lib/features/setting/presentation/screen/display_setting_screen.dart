@@ -45,6 +45,7 @@ class _DisplaySettingScreenState extends ConsumerState<DisplaySettingScreen> {
             ),
             CupertinoSwitch(
                 value: shouldShowWideView,
+                activeColor: Theme.of(context).colorScheme.onPrimary,
                 onChanged: (value) => ref
                     .read(displaySettingProvider.notifier)
                     .changeValue(value))

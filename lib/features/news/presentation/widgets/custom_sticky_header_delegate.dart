@@ -3,9 +3,7 @@ import "package:flutter/rendering.dart";
 
 enum StickyHeaderWidgetAnimation { popInOut, fadeInOut, growShrink }
 
-//Please keep all the comment for future references because the widget still
-//keep changing until found the final solution
-class RewardsStickyHeaderWidgetDelegate
+class CustomStickyHeaderWidgetDelegate
     implements SliverPersistentHeaderDelegate {
   late double fullOpacityOffset;
   late double zeroOpacityOffset;
@@ -15,53 +13,24 @@ class RewardsStickyHeaderWidgetDelegate
   double growBarHeightDiff = 0.0;
 
   final StickyHeaderWidgetAnimation headerAnimation;
-  final Widget carrousselWidget;
+  final Widget expandableWidget;
   final Widget stickyWidget;
   final double stickyWidgetHeight;
-  final String navigationTitle;
-  final bool isRewardsPage;
-  final bool isDetailPage;
-  final bool isPlanDetailPage;
-  final bool isConfigurablePackPage;
-  final bool showAppbar;
-  final bool showInboxButton;
-  final bool enableStretchHeader;
-
-  final bool enableStickyWidget;
-
-  final bool showStatusBanner;
-  final double statusBannerHeight;
-  final Color statusBannerColor;
 
   late double minExtentWidget;
   late double maxExtentWidget;
 
-  RewardsStickyHeaderWidgetDelegate(
-      {required this.carrousselWidget,
+  @override
+  final TickerProvider vsync;
+
+  CustomStickyHeaderWidgetDelegate(
+      {required this.expandableWidget,
       required this.stickyWidget,
+      required this.vsync,
       this.headerAnimation = StickyHeaderWidgetAnimation.popInOut,
-      this.navigationTitle = "",
-      this.isRewardsPage = false,
-      this.isDetailPage = false,
-      this.isPlanDetailPage = false,
-      this.isConfigurablePackPage = false,
       this.minExtentWidget = 0.0,
       this.maxExtentWidget = 0.0,
-      this.stickyWidgetHeight = kToolbarHeight,
-      this.showAppbar = true,
-      this.showInboxButton = false,
-      this.enableStretchHeader = false,
-      this.showStatusBanner = false,
-      this.statusBannerColor = Colors.white,
-      this.statusBannerHeight = 0.0,
-      this.enableStickyWidget = true})
-      : assert(() {
-          if (showStatusBanner && statusBannerHeight == 0.0) {
-            throw FlutterError("Height of status banner must more than 0 if "
-                "showStatusBanner is true");
-          }
-          return true;
-        }());
+      this.stickyWidgetHeight = kToolbarHeight});
 
   @override
   double get minExtent => minExtentWidget;
@@ -85,26 +54,10 @@ class RewardsStickyHeaderWidgetDelegate
           Expanded(
             child: Stack(
               children: [
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: stickyWidgetHeight / 2,
-                  child:
-                      // ignore: sized_box_for_whitespace
-                      Container(
-                          height: kToolbarHeight,
-                          child: Align(
-                            child: Text(
-                              navigationTitle,
-                              textAlign: TextAlign.center,
-                            ),
-                          )),
-                ),
                 Transform.translate(
                   offset: Offset(0,
-                      MediaQuery.of(context).padding.top - (shrinkOffset / 3)),
-                  child: carrousselWidget,
+                      MediaQuery.of(context).padding.top - (shrinkOffset / 4)),
+                  child: expandableWidget,
                 ),
                 Container(
                   height: MediaQuery.of(context).padding.top,
@@ -138,10 +91,6 @@ class RewardsStickyHeaderWidgetDelegate
   }
 
   void _calculateAnimationValue() {
-    if (!enableStickyWidget) {
-      return;
-    }
-
     if (headerAnimation == StickyHeaderWidgetAnimation.growShrink) {
       fullOpacityOffset = minExtent;
       zeroOpacityOffset = maxExtent;
@@ -182,7 +131,7 @@ class RewardsStickyHeaderWidgetDelegate
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
+    return false;
   }
 
   @override
@@ -194,18 +143,15 @@ class RewardsStickyHeaderWidgetDelegate
   }
 
   @override
-  TickerProvider? get vsync {
-    return null;
-  }
-
-  @override
-  OverScrollHeaderStretchConfiguration? get stretchConfiguration {
-    return enableStretchHeader ? OverScrollHeaderStretchConfiguration() : null;
-  }
+  OverScrollHeaderStretchConfiguration get stretchConfiguration =>
+      OverScrollHeaderStretchConfiguration(
+        stretchTriggerOffset: maxExtent,
+        onStretchTrigger: () async {},
+      );
 
   @override
   FloatingHeaderSnapConfiguration? get snapConfiguration {
     //return null because floating: false,
-    return null; //FloatingHeaderSnapConfiguration();
+    return FloatingHeaderSnapConfiguration(); //FloatingHeaderSnapConfiguration();
   }
 }

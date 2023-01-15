@@ -5,6 +5,7 @@ import "package:lumi_assignment/core/commons/constant.dart";
 import "package:lumi_assignment/core/navigation/app_router.dart";
 import "package:lumi_assignment/features/news/data/model/news.dart";
 import "package:lumi_assignment/features/setting/data/model/news_category.dart";
+import "package:lumi_assignment/features/setting/data/model/statistics_data.dart";
 import "package:lumi_assignment/features/setting/data/repo/setting_repository.dart";
 
 final statisticsProvider =
@@ -58,18 +59,4 @@ class StatisticsStateNotifier
             mostClickTopicsData: getMostClickTopics(),
             lastRead: lastRead)));
   }
-}
-
-class StatisticsData {
-  final NewsDetailPageParam? lastRead;
-  final int numOfNewsReadInOneAppSession;
-  final List<NewsCategory> numOfTopicsFollowed;
-  final Tuple2<NewsCategory, int>? mostClickTopicsData;
-
-  StatisticsData({
-    this.lastRead,
-    required this.numOfNewsReadInOneAppSession,
-    required this.numOfTopicsFollowed,
-    required this.mostClickTopicsData,
-  });
 }

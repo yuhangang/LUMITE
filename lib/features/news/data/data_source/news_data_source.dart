@@ -1,3 +1,4 @@
+import "dart:convert";
 import "package:dio/dio.dart";
 import "package:lumi_assignment/core/commons/mixin/api_exception_handler_mixin.dart";
 
@@ -20,7 +21,7 @@ class NewsDataSourceImpl
     try {
       Response response =
           await dio.get("https://api.luminews.my/dummy_news/$category");
-      return (response.data as List<Map<String, dynamic>>)
+      return (List<Map<String, dynamic>>.from(jsonDecode(response.data)))
           .map((e) => News.fromJson(e))
           .toList();
     } on DioError catch (error) {

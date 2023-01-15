@@ -5,7 +5,7 @@ abstract class UrlLaunchHelper {
     final uri = Uri.parse(url);
     final canLaunch = await canLaunchUrl(uri);
     if (canLaunch) {
-      await launchUrl(uri);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 }
