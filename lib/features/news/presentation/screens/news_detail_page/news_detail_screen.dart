@@ -1,5 +1,3 @@
-import "dart:async";
-
 import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -44,11 +42,9 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen>
           onProgress: (int progress) {
             ref.read(webViewProvider.notifier).updateProgress(progress);
           },
-          onPageStarted: (String url) {
-            //debugPrint("Page started loading: $url");
-          },
+          onPageStarted: (String url) {},
           onPageFinished: (String url) {
-            ref.read(webViewProvider.notifier).loadFinished();
+            _showAdsFromPublisherSnackbar(context);
           },
           onWebResourceError: (WebResourceError error) {
             ref.read(webViewProvider.notifier).loadFailed();
@@ -72,16 +68,6 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen>
         },
       )
       ..loadRequest(Uri.parse(widget.news.link));
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      if (mounted) {
-        insertOverlay(TextButton(
-            onPressed: () {},
-            child: Container(
-                color: Colors.green,
-                padding: const EdgeInsets.all(50),
-                child: const Text("abc"))));
-      }
-    });
     ref
         .read(statisticsProvider.notifier)
         .onOpenNews(widget.news, widget.category);
@@ -175,5 +161,21 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen>
         body: WebViewWidget(controller: _webViewController),
       ),
     );
+  }
+
+  void _showAdsFromPublisherSnackbar(BuildContext context) {
+    insertOverlay(context,
+        child: Container(
+            decoration: BoxDecoration(
+                color: Colors.grey.shade900,
+                borderRadius: const BorderRadius.all(Radius.circular(100))),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+            child: Text(
+              "Ads from the publishers' website",
+              style: Theme.of(context)
+                  .textTheme
+                  .subtitle1
+                  ?.copyWith(color: Colors.white),
+            )));
   }
 }

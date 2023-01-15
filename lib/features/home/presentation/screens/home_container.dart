@@ -31,6 +31,7 @@ class _HomeContainerState extends State<HomeContainer>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: Stack(fit: StackFit.expand, children: [
         NotificationListener<UserScrollNotification>(
           onNotification: handleScrollActivityDetected,

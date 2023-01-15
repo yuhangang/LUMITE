@@ -1,5 +1,12 @@
+library home_screen;
+
+import "dart:developer";
+
+import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:lumi_assignment/core/commons/helper/url_launch_helper.dart";
+import "package:lumi_assignment/core/presentation/widgets/overlay_state_mixin.dart";
 import "package:lumi_assignment/features/news/presentation/provider/home_tab_greeting_text_provider.dart";
 import "package:lumi_assignment/features/news/presentation/screens/home_screen/widgets/home_screen_categorized_news_list.dart";
 import "package:lumi_assignment/features/news/presentation/widgets/category_tab_bar.dart";
@@ -7,6 +14,9 @@ import "package:lumi_assignment/features/news/presentation/widgets/custom_sticky
 import "package:lumi_assignment/features/setting/data/model/news_category.dart";
 import "package:lumi_assignment/features/setting/presentation/provider/display_setting_provider.dart";
 import "package:lumi_assignment/features/setting/presentation/provider/news_categories_setting_provider.dart";
+import "package:visibility_detector/visibility_detector.dart";
+
+part "home_screen_tab_visibility_extension.dart";
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -16,11 +26,16 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
+    with
+        TickerProviderStateMixin,
+        WidgetsBindingObserver,
+        OverlayStateMixin,
+        RouteAware {
   TabController? _categoryTabController;
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int> _currenTabIndex = ValueNotifier(0);
   final GlobalKey<NestedScrollViewState> documentsNestedKey = GlobalKey();
+  final RouteObserver _routeObserver = RouteObserver();
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -48,9 +63,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
   void dispose() {
+    _routeObserver.unsubscribe(this);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didPushNext() {
+    //final route = ModalRoute.of(context)?.settings.name;
   }
 
   @override
@@ -164,25 +191,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       .map((e) => Builder(builder: (context) {
                             // final scrollController =
                             //     ScrollController(keepScrollOffset: true);
-                            return CustomScrollView(
-                              // controller: scrollController
-                              //   ..addListener(
-                              //     () {
-                              //       controllerListener(
-                              //         _scrollController,
-                              //         scrollController,
-                              //       );
-                              //     },
-                              //   ),
-                              key: PageStorageKey<String>(e.id),
-                              slivers: [
-                                SliverOverlapInjector(
-                                    handle: NestedScrollView
-                                        .sliverOverlapAbsorberHandleFor(
-                                            context)),
-                                _buildNewsList(e, shouldShowWideView),
-                              ],
-                            );
+                            return _applyVisibilityDetector(context,
+                                category: e,
+                                child: CustomScrollView(
+                                  // controller: scrollController
+                                  //   ..addListener(
+                                  //     () {
+                                  //       controllerListener(
+                                  //         _scrollController,
+                                  //         scrollController,
+                                  //       );
+                                  //     },
+                                  //   ),
+                                  key: PageStorageKey<String>(e.id),
+                                  slivers: [
+                                    SliverOverlapInjector(
+                                        handle: NestedScrollView
+                                            .sliverOverlapAbsorberHandleFor(
+                                                context)),
+                                    _buildNewsList(e, shouldShowWideView),
+                                  ],
+                                ));
                           }))
                       .toList()),
             );

@@ -6,14 +6,15 @@ class WebViewStateNotifier extends StateNotifier<WebViewState> {
   final Ref ref;
 
   void updateProgress(int progress) {
-    if (progress < 100) {
-      state = WebViewLoading(progress: progress / 100);
-    } else {
-      state = WebViewLoaded();
+    state = WebViewLoading(progress: progress / 100);
+    if (progress == 100) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _loadFinished();
+      });
     }
   }
 
-  void loadFinished() => state = WebViewLoaded();
+  void _loadFinished() => state = WebViewLoaded();
 
   void loadFailed() => state = WebViewFailed();
 }
