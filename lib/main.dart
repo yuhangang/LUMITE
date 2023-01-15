@@ -1,9 +1,8 @@
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:go_router/go_router.dart";
+import "package:lumi_assignment/core/navigation/app_router.dart";
 import "package:lumi_assignment/core/navigation/custom_page_transition_builder.dart";
-import "package:lumi_assignment/injection_container.dart";
 import "injection_container.dart" as di;
 
 void main() async {
@@ -26,7 +25,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appRouter = sl.get<GoRouter>();
     return MaterialApp.router(
       title: "Number Trivia",
       theme: ThemeData(
@@ -80,8 +78,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [
         Locale("en", ""), // Spanish, no country code
       ],
-      routerDelegate: appRouter.routerDelegate,
-      routeInformationParser: appRouter.routeInformationParser,
+      routerConfig: appRouter,
     );
   }
 }

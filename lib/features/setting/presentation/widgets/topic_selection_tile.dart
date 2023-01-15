@@ -42,10 +42,8 @@ class TopicSelectionTile extends StatelessWidget {
               fit: BoxFit.scaleDown,
               child: Text(
                 title,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText1
-                    ?.copyWith(color: Colors.white),
+                style: Theme.of(context).textTheme.bodyText1?.copyWith(
+                    color: isSelected ? Colors.white : Colors.grey.shade800),
               ),
             ),
           ],

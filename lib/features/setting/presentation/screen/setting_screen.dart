@@ -26,24 +26,27 @@ class SettingScreen extends StatelessWidget {
                 ),
                 SettingItem(
                   title: "Topics",
-                  onTap: () =>
-                      sl.get<Coordinator>().navigateToTopicsSettingScreen(),
+                  onTap: () => sl
+                      .get<Coordinator>()
+                      .navigateToTopicsSettingScreen(context),
                 ),
                 const SizedBox(
                   height: 16,
                 ),
                 SettingItem(
                   title: "Display 🎨",
-                  onTap: () =>
-                      sl.get<Coordinator>().navigateToDisplaySettingScreen(),
+                  onTap: () => sl
+                      .get<Coordinator>()
+                      .navigateToDisplaySettingScreen(context),
                 ),
                 const SizedBox(
                   height: 16,
                 ),
                 SettingItem(
                   title: "Statistics 📈",
-                  onTap: () =>
-                      sl.get<Coordinator>().navigateToStatsticsSettingScreen(),
+                  onTap: () => sl
+                      .get<Coordinator>()
+                      .navigateToStatsticsSettingScreen(context),
                 ),
               ],
             )),

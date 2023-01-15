@@ -5,6 +5,8 @@ import "dart:developer";
 import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:visibility_detector/visibility_detector.dart";
+
 import "package:lumi_assignment/core/commons/helper/url_launch_helper.dart";
 import "package:lumi_assignment/core/presentation/widgets/overlay_state_mixin.dart";
 import "package:lumi_assignment/features/news/presentation/provider/home_tab_greeting_text_provider.dart";
@@ -14,12 +16,20 @@ import "package:lumi_assignment/features/news/presentation/widgets/custom_sticky
 import "package:lumi_assignment/features/setting/data/model/news_category.dart";
 import "package:lumi_assignment/features/setting/presentation/provider/display_setting_provider.dart";
 import "package:lumi_assignment/features/setting/presentation/provider/news_categories_setting_provider.dart";
-import "package:visibility_detector/visibility_detector.dart";
+import "package:lumi_assignment/features/news/data/model/news.dart";
 
 part "home_screen_tab_visibility_extension.dart";
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+  final String? initialCategory;
+  final String? newsId;
+  final void Function(News, NewsCategory)? newsDetailDeeplinkCallback;
+  const HomeScreen({
+    super.key,
+    this.initialCategory,
+    this.newsId,
+    this.newsDetailDeeplinkCallback,
+  });
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
@@ -36,6 +46,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   final ValueNotifier<int> _currenTabIndex = ValueNotifier(0);
   final GlobalKey<NestedScrollViewState> documentsNestedKey = GlobalKey();
   final RouteObserver _routeObserver = RouteObserver();
+  final bool isResolvedDeeplink = false;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -72,11 +83,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void dispose() {
     _routeObserver.unsubscribe(this);
     WidgetsBinding.instance.removeObserver(this);
+
     super.dispose();
   }
 
   @override
   void didPushNext() {
+    removeOverlay();
     //final route = ModalRoute.of(context)?.settings.name;
   }
 
@@ -91,7 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             _initTabController(categoryList);
             return NestedScrollView(
               controller: _scrollController,
-              //  floatHeaderSlivers: true,
+              floatHeaderSlivers: true,
               headerSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) {
                 final stickyWidgetHeight =
@@ -239,43 +252,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildNewsList(NewsCategory category, bool shouldShowWideView) {
-    /*
-    if (category.id == "covid") {
-      return SliverToBoxAdapter(
-        child: VisibilityDetector(
-            key: Key(category.id),
-            child: HomeScreenNewsList(
-              category: category,
-              shouldShowWideView: shouldShowWideView,
-            ),
-            onVisibilityChanged: (info) {
-              if (info.visibleFraction == 1) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    width: 14 * 12 + 38,
-                    content: GestureDetector(
-                      onTap: () => UrlLaunchHelper.openUrl(
-                          "https://luminews.my/covidtracker"),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.mail),
-                          SizedBox(
-                            width: 16,
-                          ),
-                          Text("Share Statistics")
-                        ],
-                      ),
-                    )));
-              } else if (info.visibleFraction == 0) {
-                ScaffoldMessenger.of(context).clearSnackBars();
-              }
-            }),
-      );
-    }
-    */
     return HomeScreenCategorizedNewsList(
       category: category,
       shouldShowWideView: shouldShowWideView,
+      newsId: widget.newsId,
+      newsDetailDeeplinkCallback: widget.newsDetailDeeplinkCallback,
     );
   }
 
@@ -288,6 +269,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           _currenTabIndex.value = _categoryTabController!.index;
         }
       });
+    }
+
+    final matchedIndex = categoryList.indexWhere((e) {
+      return e.displayText.toLowerCase() ==
+          widget.initialCategory?.toLowerCase();
+    });
+
+    if (matchedIndex != -1) {
+      _categoryTabController?.animateTo(matchedIndex);
     }
   }
 }

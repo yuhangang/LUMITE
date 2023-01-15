@@ -152,6 +152,6 @@ class CustomStickyHeaderWidgetDelegate
   @override
   FloatingHeaderSnapConfiguration? get snapConfiguration {
     //return null because floating: false,
-    return FloatingHeaderSnapConfiguration(); //FloatingHeaderSnapConfiguration();
+    return null; //FloatingHeaderSnapConfiguration();
   }
 }

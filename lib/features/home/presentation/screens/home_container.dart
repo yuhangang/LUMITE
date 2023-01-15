@@ -1,11 +1,15 @@
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
+import "package:go_router/go_router.dart";
+import "package:lumi_assignment/core/navigation/app_path.dart" as app_path;
 import "package:lumi_assignment/features/home/presentation/widgets/animated_bottom_nav.dart";
-import "package:lumi_assignment/features/news/presentation/screens/home_screen/home_screen.dart";
-import "package:lumi_assignment/features/setting/presentation/screen/setting_screen.dart";
 
 class HomeContainer extends StatefulWidget {
-  const HomeContainer({super.key});
+  final Widget child;
+  const HomeContainer({
+    Key? key,
+    required this.child,
+  }) : super(key: key);
 
   @override
   State<HomeContainer> createState() => _HomeContainerState();
@@ -13,7 +17,6 @@ class HomeContainer extends StatefulWidget {
 
 class _HomeContainerState extends State<HomeContainer>
     with TickerProviderStateMixin {
-  final PageController _pageController = PageController();
   final bottomnavigationkey = GlobalKey();
   late AnimationController bottomNaviController;
   final ValueNotifier<int> _currentTabIndex = ValueNotifier(0);
@@ -35,11 +38,7 @@ class _HomeContainerState extends State<HomeContainer>
       body: Stack(fit: StackFit.expand, children: [
         NotificationListener<UserScrollNotification>(
           onNotification: handleScrollActivityDetected,
-          child: PageView(
-            controller: _pageController,
-            physics: const NeverScrollableScrollPhysics(),
-            children: const [HomeScreen(), SettingScreen()],
-          ),
+          child: widget.child,
         ),
         ValueListenableBuilder<int>(
             valueListenable: _currentTabIndex,
@@ -47,28 +46,14 @@ class _HomeContainerState extends State<HomeContainer>
               return AnimatedBottomNaviBar(
                 bottomNaviController: bottomNaviController,
                 bottomnavigationkey: bottomnavigationkey,
-                index: index,
+                index: _calculateSelectedIndex(context),
                 items: const [
                   BottomNavigationBarItem(
                       icon: Icon(Icons.newspaper), label: "Home"),
                   BottomNavigationBarItem(
                       icon: Icon(Icons.settings), label: "Settings"),
                 ],
-                onTapItem: (_) {
-                  _currentTabIndex.value = _;
-                  setState(() {
-                    _pageController.jumpToPage(_);
-                    //if ((_ - index).abs() > 1) {
-                    //  index = _;
-                    //  pageController.jumpToPage(_);
-                    //} else {
-                    //  index = _;
-                    //  pageController.animateToPage(_,
-                    //      duration: const Duration(milliseconds: 400),
-                    //      curve: Curves.easeOut);
-                    //}
-                  });
-                },
+                onTapItem: (tappedIndex) => _onItemTapped(tappedIndex, context),
               );
             }),
       ]),
@@ -98,5 +83,28 @@ class _HomeContainerState extends State<HomeContainer>
       bottomNaviController.reverse();
     }
     return true;
+  }
+
+  int _calculateSelectedIndex(BuildContext context) {
+    final String location = GoRouterState.of(context).location;
+    if (location.startsWith(app_path.setting)) {
+      return 1;
+    }
+    if (location.startsWith(app_path.home)) {
+      return 0;
+    }
+
+    return 0;
+  }
+
+  void _onItemTapped(int index, BuildContext contxt) {
+    switch (index) {
+      case 0:
+        context.go(app_path.home);
+        break;
+      case 1:
+        context.go(app_path.setting);
+        break;
+    }
   }
 }

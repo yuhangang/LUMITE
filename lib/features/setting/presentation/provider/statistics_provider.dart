@@ -54,7 +54,8 @@ class StatisticsStateNotifier
     state = data.fold(
         (l) => AsyncError(l, StackTrace.current),
         (r) => AsyncData(StatisticsData(
-            numOfTopicsFollowed: r,
+            numOfTopicsFollowed:
+                r.where((element) => element.optional).toList(),
             numOfNewsReadInOneAppSession: numOfNewsReadInOneAppSession,
             mostClickTopicsData: getMostClickTopics(),
             lastRead: lastRead)));

@@ -14,7 +14,7 @@ import "package:lumi_assignment/features/setting/data/repo/setting_repository.da
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  sl.registerSingleton<GoRouter>(getRouter());
+  sl.registerSingleton<GoRouter>(appRouter);
   sl.registerSingleton<Coordinator>(CoordinatorImpl());
   final dio = Dio();
   if (kDebugMode || kProfileMode) {
