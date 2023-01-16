@@ -81,7 +81,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   void didPushNext() {
-    removeOverlay();
+    if (isOverlayShown) {
+      removeOverlay();
+    }
   }
 
   @override
@@ -252,6 +254,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
         if (categoryList[_categoryTabController!.index].id == "covid") {
           _handleShowingCovidTrackerSnackBar();
+        } else if (isOverlayShown) {
+          removeOverlay();
         }
       });
     }
