@@ -1,24 +1,16 @@
-library home_screen;
-
-import "dart:developer";
-
 import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:visibility_detector/visibility_detector.dart";
-
 import "package:lumi_assignment/core/commons/helper/url_launch_helper.dart";
 import "package:lumi_assignment/core/presentation/widgets/overlay_state_mixin.dart";
 import "package:lumi_assignment/features/news/presentation/provider/home_tab_greeting_text_provider.dart";
 import "package:lumi_assignment/features/news/presentation/screens/home_screen/widgets/home_screen_categorized_news_list.dart";
-import "package:lumi_assignment/features/news/presentation/widgets/category_tab_bar.dart";
-import "package:lumi_assignment/features/news/presentation/widgets/custom_sticky_header_delegate.dart";
+import "package:lumi_assignment/features/news/presentation/screens/home_screen/widgets/category_tab_bar.dart";
+import "package:lumi_assignment/features/news/presentation/screens/home_screen/widgets/custom_sticky_header_delegate.dart";
 import "package:lumi_assignment/features/setting/data/model/news_category.dart";
 import "package:lumi_assignment/features/setting/presentation/provider/display_setting_provider.dart";
 import "package:lumi_assignment/features/setting/presentation/provider/news_categories_setting_provider.dart";
 import "package:lumi_assignment/features/news/data/model/news.dart";
-
-part "home_screen_tab_visibility_extension.dart";
 
 class HomeScreen extends ConsumerStatefulWidget {
   final String? initialCategory;
@@ -90,8 +82,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void didPushNext() {
     removeOverlay();
-    //final route = ModalRoute.of(context)?.settings.name;
   }
+
+  @override
+  void didPopNext() {}
 
   @override
   Widget build(BuildContext context) {
@@ -202,29 +196,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   controller: _categoryTabController,
                   children: categoryList
                       .map((e) => Builder(builder: (context) {
-                            // final scrollController =
-                            //     ScrollController(keepScrollOffset: true);
-                            return _applyVisibilityDetector(context,
-                                category: e,
-                                child: CustomScrollView(
-                                  // controller: scrollController
-                                  //   ..addListener(
-                                  //     () {
-                                  //       controllerListener(
-                                  //         _scrollController,
-                                  //         scrollController,
-                                  //       );
-                                  //     },
-                                  //   ),
-                                  key: PageStorageKey<String>(e.id),
-                                  slivers: [
-                                    SliverOverlapInjector(
-                                        handle: NestedScrollView
-                                            .sliverOverlapAbsorberHandleFor(
-                                                context)),
-                                    _buildNewsList(e, shouldShowWideView),
-                                  ],
-                                ));
+                            return CustomScrollView(
+                              key: PageStorageKey<String>(e.id),
+                              slivers: [
+                                SliverOverlapInjector(
+                                    handle: NestedScrollView
+                                        .sliverOverlapAbsorberHandleFor(
+                                            context)),
+                                _buildNewsList(e, shouldShowWideView),
+                              ],
+                            );
                           }))
                       .toList()),
             );
@@ -268,6 +249,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         if (_categoryTabController!.index != _currenTabIndex.value) {
           _currenTabIndex.value = _categoryTabController!.index;
         }
+
+        if (categoryList[_categoryTabController!.index].id == "covid") {
+          _handleShowingCovidTrackerSnackBar();
+        }
       });
     }
 
@@ -279,5 +264,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     if (matchedIndex != -1) {
       _categoryTabController?.animateTo(matchedIndex);
     }
+  }
+
+  void _handleShowingCovidTrackerSnackBar() {
+    insertOverlay(context,
+        child: GestureDetector(
+          onTap: () {
+            UrlLaunchHelper.openUrl("https://luminews.my/covidtracker");
+            removeOverlay();
+          },
+          child: Container(
+            decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onPrimary,
+                borderRadius: const BorderRadius.all(Radius.circular(100))),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  CupertinoIcons.share,
+                  size: Theme.of(context).textTheme.subtitle1?.fontSize,
+                  color: Colors.white,
+                ),
+                const SizedBox(
+                  width: 16,
+                ),
+                Text(
+                  "Share Statistics",
+                  style: Theme.of(context)
+                      .textTheme
+                      .subtitle1
+                      ?.copyWith(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }

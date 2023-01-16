@@ -5,7 +5,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:lumi_assignment/core/navigation/coordinator.dart";
 import "package:lumi_assignment/features/news/data/model/news.dart";
 import "package:lumi_assignment/features/news/presentation/provider/news_list_provider.dart";
-import "package:lumi_assignment/features/news/presentation/widgets/news_item_widget.dart";
+import "package:lumi_assignment/features/news/presentation/screens/home_screen/widgets/news_item_widget.dart";
 import "package:lumi_assignment/features/setting/data/model/news_category.dart";
 import "package:lumi_assignment/injection_container.dart";
 

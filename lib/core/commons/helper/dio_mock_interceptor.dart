@@ -13,7 +13,7 @@ class DioMockInterceptor extends Interceptor {
         final mockData =
             await rootBundle.loadString("assets/mock_data/news/$category.json");
         final mockResponse = Response(data: mockData, requestOptions: options);
-        handler.resolve(mockResponse);
+        handler.resolve(mockResponse, true);
       } catch (e) {
         super.onRequest(options, handler);
       }

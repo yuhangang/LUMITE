@@ -40,7 +40,7 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
 GoRouter getRouter() => GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: app_path.home,
-    observers: [NavigatorObserver()],
+    observers: [RouteObserver<PageRoute>()],
     debugLogDiagnostics: true,
     routes: [
       ShellRoute(

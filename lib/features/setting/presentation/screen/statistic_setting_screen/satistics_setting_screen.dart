@@ -14,13 +14,34 @@ class StatisticsSettingScreen extends ConsumerStatefulWidget {
 }
 
 class _StatisticsSettingScreenState
-    extends ConsumerState<StatisticsSettingScreen> {
+    extends ConsumerState<StatisticsSettingScreen> with RouteAware {
+  final RouteObserver _routeObserver = RouteObserver();
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(statisticsProvider.notifier).load();
     });
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    _routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // TODO:attempt of a solution to gracefully handle refresh statistics when back from new details
+    //
+    // ref.read(statisticsProvider.notifier).load();
   }
 
   @override

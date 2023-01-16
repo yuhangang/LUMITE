@@ -21,7 +21,6 @@ class LastReadWidget extends ConsumerWidget {
       onTap: () {
         sl.get<Coordinator>().navigateToNewsDetailScreen(
             context, lastRead.news, lastRead.category);
-        // TODO: thinking about a solution to gracefully handle refresh statistics when back from new details
         Future.delayed(const Duration(seconds: 1), () {
           ref.read(statisticsProvider.notifier).load();
         });
